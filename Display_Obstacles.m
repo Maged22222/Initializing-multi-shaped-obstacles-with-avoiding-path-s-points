@@ -1,7 +1,10 @@
-function Display_Obstacles(obstacles, pointsAroundObstacles, iter)
+function Display_Obstacles(obstacles, pointsAroundObstacles, iter, bolean_Points)
 
     if nargin < 3
         iter = [];
+    end
+    if nargin < 4
+        bolean_Points = [];
     end
 
     clf;
@@ -12,7 +15,13 @@ function Display_Obstacles(obstacles, pointsAroundObstacles, iter)
     end
 
     if ~isempty(pointsAroundObstacles)
-        plot3(pointsAroundObstacles(:, 1), pointsAroundObstacles(:, 2), pointsAroundObstacles(:, 3), ...
+        if ~isempty(bolean_Points) && length(bolean_Points) == size(pointsAroundObstacles, 1)
+            validPts = pointsAroundObstacles(bolean_Points == 0, :);
+        else
+            validPts = pointsAroundObstacles;
+        end
+
+        plot3(validPts(:, 1), validPts(:, 2), validPts(:, 3), ...
               'b.', 'MarkerSize', 8, 'DisplayName', 'Surrounding Points');
     end
 

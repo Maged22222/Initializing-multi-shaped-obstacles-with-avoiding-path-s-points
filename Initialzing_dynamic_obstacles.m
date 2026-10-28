@@ -12,11 +12,24 @@ numPointsThet = 10; % it Means 9 around the obstacle
 numPointsPhi = 7; % it Means 5 level of points around the obstacles
 Safty_Distance = 0.3;
 
-% Initialize obstacles with linear paths
-obstacles = initializeObstaclesWithLinearPaths(startPoints, endPoints, obstacleRadius, maxObstacleVelocity);
+obstacleType = 'complex'; % 'sphere', 'complex', 'ellipsoid', 'cylinder', 'box'
 
-% Random complicated obstacles:
-%obstacles = generateComplexObstacles(startPoints, endPoints, obstacleRadius, maxObstacleVelocity, numPointsThet, numPointsPhi, Safty_Distance);
+% Initialize obstacles with linear paths
+switch lower(obstacleType)
+    case 'sphere'
+        obstacles = initializeObstaclesWithLinearPaths(startPoints, endPoints, obstacleRadius, maxObstacleVelocity);
+    case 'complex'
+        obstacles = generateComplexObstacles(startPoints, endPoints, obstacleRadius, maxObstacleVelocity, numPointsThet, numPointsPhi, Safty_Distance);
+    case 'ellipsoid'
+        obstacles = generateEllipsoidObstacles(startPoints, endPoints, obstacleRadius, maxObstacleVelocity, numPointsThet, numPointsPhi, Safty_Distance);
+    case 'cylinder'
+        obstacles = generateCylinderObstacles(startPoints, endPoints, obstacleRadius, maxObstacleVelocity, numPointsThet, numPointsPhi, Safty_Distance);
+    case 'box'
+        obstacles = generateBoxObstacles(startPoints, endPoints, obstacleRadius, maxObstacleVelocity, numPointsThet, numPointsPhi, Safty_Distance);
+    otherwise
+        error('Unknown obstacle type: %s', obstacleType);
+end
+
 totalDistances = vecnorm(endPoints - startPoints, 2, 2);
 
 numIterations = 100;
@@ -24,8 +37,8 @@ dt = 0.05;
 
 % Plot Dynamic simulation
 for iter = 1:numIterations
-    [pointsAroundObstacles, ~] = calculatePointsAroundObstacles(obstacles, numPointsThet, numPointsPhi, Safty_Distance);
-    Display_Obstacles(obstacles, pointsAroundObstacles, iter);
+    [pointsAroundObstacles, bolean_Points] = calculatePointsAroundObstacles(obstacles, numPointsThet, numPointsPhi, Safty_Distance);
+    Display_Obstacles(obstacles, pointsAroundObstacles, iter, bolean_Points);
 
     for i = 1:obstacle_num
         newPos = obstacles.position(i, :) + obstacles.velocity(i, :) * dt;

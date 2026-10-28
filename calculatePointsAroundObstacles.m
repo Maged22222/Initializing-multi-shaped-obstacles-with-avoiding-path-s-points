@@ -1,11 +1,10 @@
-function [pointsAroundObstacles, Non_realpointsAroundObstacles] = calculatePointsAroundObstacles(obstacles, numPointsTheta, numPointsPhi, radiusOffset)
+function [pointsAroundObstacles, bolean_Points] = calculatePointsAroundObstacles(obstacles, numPointsTheta, numPointsPhi, radiusOffset)
 
     theta = linspace(0, 2*pi, numPointsTheta);
     phi = linspace(0, pi, numPointsPhi);
     [Theta, Phi] = meshgrid(theta, phi);
 
     pointsAroundObstacles = [];
-    Non_realpointsAroundObstacles = zeros(numPointsTheta*numPointsPhi, size(obstacles.position, 1));
     isComplex = isfield(obstacles, 'shape') && ~isempty(obstacles.shape);
 
     for i = 1:size(obstacles.position, 1)
@@ -25,9 +24,13 @@ function [pointsAroundObstacles, Non_realpointsAroundObstacles] = calculatePoint
         end
 
         pointsAroundObstacles = [pointsAroundObstacles; xSphere(:), ySphere(:), zSphere(:)];
-        points = [xSphere(:), ySphere(:), zSphere(:)];
+    end
 
-        [~, ~, repeatedIdx] = findRepeatedPoints(points, 1e-5);
-        Non_realpointsAroundObstacles(1:size(repeatedIdx, 1), i) = repeatedIdx + (numPointsTheta*numPointsPhi*(i-1));
+    if ~isempty(pointsAroundObstacles)
+        [~, ~, repeatedIdx] = findRepeatedPoints(pointsAroundObstacles, 1e-5);
+        bolean_Points = false(size(pointsAroundObstacles, 1), 1);
+        bolean_Points(repeatedIdx) = true;
+    else
+        bolean_Points = false(0, 1);
     end
 end
